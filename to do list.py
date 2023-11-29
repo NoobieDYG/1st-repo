@@ -1,6 +1,8 @@
 #to do list
 from tkinter import * 
 from tkinter.font import Font
+from tkinter import filedialog
+import pickle
 
 root=Tk()
 root.geometry('500x500')
@@ -34,7 +36,7 @@ my_scrollbar.config(command=my_list.yview)
 #entrybox
 
 
-my_entry = Entry(root, font=('Helvetica', 24), selectbackground="#a6a6a6")
+my_entry = Entry(root, font=('Helvetica', 24), selectbackground="#a6a6a6", width=24)
 my_entry.pack(pady=20)
 
 
@@ -61,7 +63,8 @@ def delete_crossed():
     while count < my_list.size():
         if my_list.itemcget(count, 'fg') == "#dedede":
             my_list.delete(my_list.index(count))
-    count = count+1
+        else :
+            count = count+1
 
 
 #add button
@@ -77,5 +80,57 @@ add_button.pack(side="left", padx=20)
 cross_off_button.pack(side="left")
 uncross_button.pack(side="left", padx=20)
 delete_crossed_button.pack(side="left", padx=20)
+
+my_menu = Menu(root)
+root.config(menu=my_menu)
+
+file_menu = Menu(my_menu, tearoff=False)
+my_menu.add_cascade(label="File", menu=file_menu )
+
+def save_list():
+    file_name=filedialog.asksaveasfilename(initialdir= "C:/data", title="Save File", filetypes=(("Dat Files", "*.dat", "All Files", "*.*")))
+    if file_name:
+        if file_name.endswith(".dat"):
+            pass
+        else:
+            file_name = f'{file_name}.dat'
+            count = 0
+            while count<my_list.size():
+                if my_list.itemcget(count, "fg") == "dedede":
+                    my_list.delete(my_list.index(count))
+                else:
+                    count=+1
+            stuff - my_list.get(0, END)
+
+            output_file = open(file_name, "wb")
+
+            #add stuff to file
+            pickle.dump(stuff, output_file)
+
+
+def open_list():
+    file_name= filedialog.askopenfilename(initialdir= "C:/data", title="Open File", filetypes=(("Dat Files", "*.dat", "All Files", "*.*")))
+    if file_name:
+        my_list.delete(0, END)
+        #open the file
+        input_file = open(file_name, "rb")
+
+        #load data
+        stuff = pickle.load(input_file)
+
+        #output stuff
+        for item in stuff:
+            my_list.append(item)
+
+def delete_list():
+    my_list.delete(0,END)
+
+file_menu.add_command(label="Save list", command = save_list)
+file_menu.add_command(label="Open list", command = open_list)
+file_menu.add_separator()
+file_menu.add_command(label="Delete list", command = delete_list)
+
+
+
 
 root.mainloop()
